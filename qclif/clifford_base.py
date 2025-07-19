@@ -199,13 +199,13 @@ class _RandomSymplectic(SymplecticArrayBase):
         e1 = cls.basis_vector(0, nn)
         en = cls.basis_vector(n, nn)
 
-        v = cls.random_matrix(nn, allow_zero=False)
+        v = cls.random_array(nn, allow_zero=False)
 
         t1, t2 = Transvection.find_transvection(e1, v)
 
         assert np.array_equal(t1(t2(e1)), v), (v, t1, t2)
 
-        b = cls.random_matrix(nn, allow_zero=True)
+        b = cls.random_array(nn, allow_zero=True)
         b[n]=0
         u0 = t1(t2(b))
 
@@ -654,7 +654,7 @@ class _DecomposeClifford(_SpecialClifford):
         return self
 
 class CliffordBase(_RandomSymplectic, _DecomposeClifford, _CliffordValidation):
-
+    _validate_prime=True
     
     @classmethod
     def clifford_group_size(cls, n:int) -> int:
@@ -667,10 +667,7 @@ class CliffordBase(_RandomSymplectic, _DecomposeClifford, _CliffordValidation):
             int: The size of the Clifford group on n qudits of dimension d.
         """
         d = cls.d
-        if not isinstance(n, Integral):
-            raise ValueError("The number of qudits must be an integer")
-        if not n>=0:
-            raise ValueError("n must be a nonnegative integer", n)
+        cls._validate_qudit_indices(n)
         return d**(n*(n+2)) * math.prod(d**(2*j)-1 for j in range(1, n+1))
     
-    
+

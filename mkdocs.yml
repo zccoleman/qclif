@@ -1,0 +1,21 @@
+site_name: Qudit Cliffords
+# site_url: https://test.org
+
+
+
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - API Reference: api.md
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        paths: []
+      
+theme:
+  name: "rtd-dropdown"
+
+

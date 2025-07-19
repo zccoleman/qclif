@@ -9,7 +9,7 @@ authors = [
 ]
 description = "Clifford gates for qudits"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = ["quantum computing", "qudit"]
 license = "GPL-3.0"
 classifiers = [

@@ -94,7 +94,7 @@ def test_embedding():
                 [3, 0, 3, 4, 4, 4]],
                 ).embed_symplectic().is_symplectic_matrix()
     
-    t = CD13.random_matrix((6,6))
+    t = CD13.random_array((6,6))
     embed = t.embed_symplectic()
 
     assert embed.n==4

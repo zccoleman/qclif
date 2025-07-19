@@ -20,7 +20,20 @@ class DNaryMeta(ABCMeta):
     """
     def __new__(cls, clsname, bases, attrs):
         if 'd' in attrs:
-            attrs['_d'] = attrs.pop('d')
+            d = attrs.pop('d')
+            
+            if (validate_prime:=attrs.get('_validate_prime')) is not None:
+                pass
+            else:
+                for base in bases:
+                    if (validate_prime:=getattr(base, '_validate_prime', None)) is not None:
+                        break
+                else:
+                    validate_prime=False
+
+            if validate_prime:
+                validate_primes(d)
+            attrs['_d'] = d
             attrs['d'] = dprop
         return super().__new__(cls, clsname, bases, attrs)
     d=dprop
@@ -46,7 +59,7 @@ class DNaryMeta(ABCMeta):
         return u
     
 
-class PrimeDnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
+class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
     """Base class for d-nary integer numpy arrays (with d prime) that are either 1d or 2d square arrays. 
     
     Do not create instances of this class; instead, subclass this class, setting a class property for d, then create instances of that subclass like so:
@@ -58,6 +71,8 @@ class PrimeDnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
     Accepts any data acceptable by np.array(...). 
     """
     
+    _validate_prime=False
+
     @property
     @abstractmethod
     def d(self):
@@ -175,7 +190,7 @@ class PrimeDnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         """Alias to `int_to_dnary(n, cls.d)`.
 
         Args:
-            input_integer (int): The integer to be factored into its d-nary digits.
+            n (int): The integer to be factored into its d-nary digits.
             result_list_size (int | None, optional): The length of the list to return; if None, will use the minimum number of digits to result the input integer in d-nary. Defaults to None.
 
         Raises:
@@ -216,7 +231,7 @@ class PrimeDnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
 
 
     @classmethod
-    def random_matrix(cls, shape:tuple[int], allow_zero=True) -> Self:
+    def random_array(cls, shape:tuple[int], allow_zero=True) -> Self:
         """Returns an array of the given shape with uniform random integers mod d.
 
         Args:
@@ -229,7 +244,7 @@ class PrimeDnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         if allow_zero:
             return cls(np.random.randint(0, cls.d, shape))
         for i in range(1000):
-            a = cls.random_matrix(shape, allow_zero=True)
+            a = cls.random_array(shape, allow_zero=True)
             if a.is_nonzero():
                 return a
         raise RuntimeError('Could not create a non-zero random matrix.')
