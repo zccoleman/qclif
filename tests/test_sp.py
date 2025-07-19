@@ -139,7 +139,7 @@ def test_index_symplectic():
     )
     
 def test_clifford_decomposition():
-    for i in range(20):
+    for _ in range(20):
         assert CD3.random_symplectic(1).decompose()
         assert CD5.random_symplectic(5).decompose()
         assert CD2.random_symplectic(2).decompose()

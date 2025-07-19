@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "numpy", "sympy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qclif"
+authors = [
+    {name = "Zachary Coleman", email = "coleman.zacharyc@gmail.com"},
+]
+description = "Clifford gates for qudits"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["quantum computing", "qudit"]
+license = "GPL-3.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "sympy",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+stim = ["stim"]
+
+[project.urls]
+Homepage = "https://github.com/zccoleman/qclif"
+
+[tool.setuptools.dynamic]
+version = {attr = "qclif.__version__"}

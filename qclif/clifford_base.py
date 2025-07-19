@@ -538,7 +538,7 @@ class _DecomposeClifford(_SpecialClifford):
         """
         assert self[i,i]%self.d
         if self[i,i] != 1:
-            self = self._apply_operator(self.clif_mult(i, self.dnary_inverse(self[i,i]), n=self.n))
+            self = self._apply_operator(self.clif_mult(i, self.dnary_inverse(self[i,i].item()), n=self.n))
         return self
 
     def _get_first_n_rows_except_i_to_zero(self, i:int) -> Self:

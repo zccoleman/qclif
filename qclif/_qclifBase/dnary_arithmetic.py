@@ -85,33 +85,41 @@ def dnary_inverse(input_integer: int, d: int) -> int:
     Returns:
         int: The integer n such that n * input_integer % d = 1.
     """
-    validate_integers(input_integer, d)
-    if sp.isprime(d) and input_integer!=0:
-        return input_integer**(d-2)%d
-
-    return euclid_algorithm(input_integer, d)
-
-def euclid_algorithm(input_integer:int, d:int) -> int:
-    validate_integers(input_integer, d)
-    if input_integer>d:
-        input_integer = input_integer%d
-    if not math.gcd(input_integer, d)==1:
-        return None
     
-    t, newt = 0, 1
-    r, newr = d, input_integer
-
-    while newr != 0:
-        quotient = r//newr
-        (t, newt) = (newt, t-quotient*newt) 
-        (r, newr) = (newr, r-quotient*newr)
-
-    if r > 1:
+    try:
+        return pow(input_integer, -1, d)
+    except ValueError:
         return None
-    if t < 0:
-        t = t + d
+    # except TypeError:
+    #     if isinstance(input_integer, np.int_):
+    #         return pow(int(input_integer), -1, d)
+#     validate_integers(input_integer, d)
+#     if sp.isprime(d) and input_integer!=0:
+#         return input_integer**(d-2)%d
 
-    return t
+#     return euclid_algorithm(input_integer, d)
+
+# def euclid_algorithm(input_integer:int, d:int) -> int:
+#     validate_integers(input_integer, d)
+#     if input_integer>d:
+#         input_integer = input_integer%d
+#     if not math.gcd(input_integer, d)==1:
+#         return None
+    
+#     t, newt = 0, 1
+#     r, newr = d, input_integer
+
+#     while newr != 0:
+#         quotient = r//newr
+#         (t, newt) = (newt, t-quotient*newt) 
+#         (r, newr) = (newr, r-quotient*newr)
+
+#     if r > 1:
+#         return None
+#     if t < 0:
+#         t = t + d
+
+#     return t
 
 def rint(i:Real)->int:
     """Rounds i to the nearest integer and returns an integer type.
