@@ -169,8 +169,26 @@ class Transvection:
         assert np.array_equal(T1(z),v)
         return T1, T2
 
-class _RandomSymplectic(SymplecticArrayBase):
+class CliffordBase(SymplecticArrayBase):
+    """A base class for your Clifford group!
 
+    """
+    _validate_prime=True
+    
+    @classmethod
+    def clifford_group_size(cls, n:int) -> int:
+        """Compute the size of the Clifford group for any number of qudits for the calling class's modulus d.
+
+        Args:
+            n (int): The number of qudits. Must be non-negative.
+
+        Returns:
+            int: The size of the Clifford group on n qudits of dimension d.
+        """
+        d = cls.d
+        cls._validate_qudit_indices(n)
+        return d**(n*(n+2)) * math.prod(d**(2*j)-1 for j in range(1, n+1))
+    
     @classmethod
     def symplectic_group_size(cls, n: int) -> int:
         """Returns the size of the symplectic group for a given n.
@@ -274,7 +292,7 @@ class _RandomSymplectic(SymplecticArrayBase):
     
         return T_prime(t1(t2(Q)))
 
-class _CliffordValidation(object):
+
     @staticmethod
     def _validate_qudit_indices(num_qudits:int, *qudit_indices):
         """Validates whether a list of given qudit indices are valid given the total number of qudits available, and raises exceptions if not.
@@ -302,9 +320,62 @@ class _CliffordValidation(object):
             if not r<cls.d:
                 raise ValueError(f'Input must be less than the class modulus {cls.d}:', r)
 
-class _SpecialClifford(SymplecticArrayBase):
     @classmethod
-    def identity(cls, n: int) -> Self:
+    def from_named_gate(
+        cls,
+        name: Literal['I', 'ID', 'SWAP',
+                      'MULT', 'CSUM',
+                      'PHASE', 'S', 'P',
+                      'PHASE_DG', 'S_DG', 'P_DG',
+                      'H', 'FOURIER', 'F',
+                      'H_DG', 'FOURIER_DG', 'F_DG',
+                     ], 
+        *args,
+    ) -> Self:
+        """Create a Clifford representation for a named gate.
+        Options are:
+            - The Identity gate (`I` or `ID`)
+            - The Multiplier gate (`MULT`)
+            - The `SWAP` gate
+            - The `CSUM` gate
+            - The generalized phase gate (or its Hermitian conjugate) (`PHASE` (`PHASE_DG`), `S` (`S_DG`), or `P` (`P_DG`))
+            - The generalized Hadamard gate (or its Hermitian conjugate) (`H` (`H_DG), `FOURIER` (`FOURIER_DG`), or `F` (`F_DG`))
+
+        Args:
+            name (Literal[&#39;I&#39;, &#39;ID&#39;, &#39;SWAP&#39;, &#39;MULT&#39;, &#39;CSUM&#39;, &#39;PHASE&#39;, &#39;S&#39;, &#39;P&#39;, &#39;PHASE_DG&#39;, &#39;S_DG&#39;, &#39;P_DG&#39;, &#39;H&#39;, &#39;FOURIER&#39;, &#39;F&#39;, &#39;H_DG&#39;, &#39;FOURIER_DG&#39;, &#39;F_DG&#39;, ]): _description_
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            Self: _description_
+        """
+        
+        methods = {
+            'I':        cls._identity,
+            'ID':       cls._identity,
+            'SWAP':     cls._clif_swap,
+            'MULT':     cls._clif_mult,
+            'CSUM':     cls._clif_csum,
+            'PHASE':    cls._clif_phase,
+            'S':        cls._clif_phase,
+            'P':        cls._clif_phase,
+            'PHASE_DG': cls._clif_phase_inverse,
+            'S_DG':     cls._clif_phase_inverse,
+            'P_DG':     cls._clif_phase_inverse,
+            'H':        cls._clif_fourier,
+            'FOURIER':  cls._clif_fourier,
+            'F':        cls._clif_fourier,
+            'H_DG':     cls._clif_fourier,
+            'FOURIER_DG': cls._clif_fourier,
+            'F_DG':     cls._clif_fourier, 
+        }
+        if name not in methods:
+            raise ValueError('Not a named gate', name)
+        return methods[name](*args)
+
+    @classmethod
+    def _identity(cls, n: int) -> Self:
         """Representation for the identity gate.
 
         Args:
@@ -318,7 +389,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_swap(cls, i: int, j: int, n: int) -> Self:
+    def _clif_swap(cls, i: int, j: int, n: int) -> Self:
         """Representation for Clifford gate that swaps qudits i and j in an n-qudit system.
         
         Args:
@@ -337,7 +408,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
 
     @classmethod
-    def clif_mult(cls, i:int, r:int, n:int) -> Self:
+    def _clif_mult(cls, i:int, r:int, n:int) -> Self:
         """Representation for the Clifford gate that multiplies the configuration space of qudit i by r in an n-qudit system.
         For example, a mult(2) gate on d=3 qudits will take 0 -> 0, 1 -> 2, and 2 -> 1 (4 mod 3 = 1).
 
@@ -360,7 +431,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_csum(cls, i:int, j:int, r:int, n:int) -> Self:
+    def _clif_csum(cls, i:int, j:int, r:int, n:int) -> Self:
         """Representation for the CSUM(i,j)^r Clifford gate, i.e. adding qudit i to qudit j, r times.
 
         Args:
@@ -382,7 +453,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_phase(cls, i:int, r:int, n:int) -> Self:
+    def _clif_phase(cls, i:int, r:int, n:int) -> Self:
         """Representation of the phase gate on qudit i, r times.
 
         Args:
@@ -402,7 +473,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_phase_inverse(cls, i:int, r:int, n:int) -> Self:
+    def _clif_phase_inverse(cls, i:int, r:int, n:int) -> Self:
         """Representation of the inverse phase gate on qudit i, r times.
 
         Args:
@@ -422,7 +493,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_fourier(cls, i:int, n:int) -> Self:
+    def _clif_fourier(cls, i:int, n:int) -> Self:
         """Representation of the Fourier transform gate, or the qudit-generalized H gate.
 
         Args:
@@ -442,7 +513,7 @@ class _SpecialClifford(SymplecticArrayBase):
         return Q
     
     @classmethod
-    def clif_fourier_inv(cls, i:int, n:int) -> Self:
+    def _clif_fourier_inv(cls, i:int, n:int) -> Self:
         """Representation of the inverse Fourier transform gate.
 
         Args:
@@ -460,8 +531,6 @@ class _SpecialClifford(SymplecticArrayBase):
         Q.name = f'Hdg({i})'
         return Q
 
-class _DecomposeClifford(_SpecialClifford):
-    
     def decompose(self, output_form:Literal['string', 'matrix']='string') -> list[str|Self]:
         """Decomposes a symplectic matrix into a product of elementary symplectic matrices, each of which correspond to a known qudit Clifford gate.
 
@@ -652,22 +721,3 @@ class _DecomposeClifford(_SpecialClifford):
             self = self._apply_operator(self.clif_fourier(i, n))
         
         return self
-
-class CliffordBase(_RandomSymplectic, _DecomposeClifford, _CliffordValidation):
-    _validate_prime=True
-    
-    @classmethod
-    def clifford_group_size(cls, n:int) -> int:
-        """Compute the size of the Clifford group for any number of qudits for the calling class's modulus d.
-
-        Args:
-            n (int): The number of qudits. Must be non-negative.
-
-        Returns:
-            int: The size of the Clifford group on n qudits of dimension d.
-        """
-        d = cls.d
-        cls._validate_qudit_indices(n)
-        return d**(n*(n+2)) * math.prod(d**(2*j)-1 for j in range(1, n+1))
-    
-

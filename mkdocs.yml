@@ -6,16 +6,21 @@ site_name: Qudit Cliffords
 nav:
   - Home: index.md
   - Usage: usage.md
-  - API Reference: api.md
+  - API Reference:
+    - Clifford Gates: clifford.md
+    - Symplectic Matrices: symplectic.md
+    - DNary Matrices: dnary.md
+
 
 plugins:
 - search
+- autorefs
 - mkdocstrings:
     handlers:
       python:
         paths: []
       
 theme:
-  name: "rtd-dropdown"
+  name: "readthedocs"
 
 
