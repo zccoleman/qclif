@@ -4,8 +4,8 @@ import math
 from typing import Self, Any, Literal
 from numbers import Integral
 
-from ._qclifBase.symplectic_array_base import SymplecticArrayBase
-from ._qclifBase.validation import validate_primes
+from qclif.symplectic_array import SymplecticArrayBase
+from qclif.validation import validate_primes
 
 class Transvection:
     r"""A class representing transvections, a class of linear transformations on vectors.
@@ -546,7 +546,7 @@ class CliffordBase(SymplecticArrayBase):
         assert np.array_equal(self, self.eye(2*self.n))
 
         if not hasattr(self, 'operators'):
-            self._apply_operator(self.identity(self.n))
+            self._apply_operator(self._identity(self.n))
         if output_form=='matrix':
             return self.operators
         return [op.name for op in self.operators]
@@ -589,11 +589,11 @@ class CliffordBase(SymplecticArrayBase):
             assert row is not None
 
             if row<self.n:
-                self = self._apply_operator(self.clif_swap(row, i, self.n))
+                self = self._apply_operator(self._clif_swap(row, i, self.n))
             else:
-                self =self._apply_operator(self.clif_fourier(row-self.n, self.n))
+                self =self._apply_operator(self._clif_fourier(row-self.n, self.n))
                 if row != i+self.n:
-                    self =self._apply_operator(self.clif_swap(row-self.n, i, self.n))
+                    self =self._apply_operator(self._clif_swap(row-self.n, i, self.n))
         return self
     
     def _get_nonzero_ii_to_one(self, i:int) -> Self:
@@ -607,7 +607,7 @@ class CliffordBase(SymplecticArrayBase):
         """
         assert self[i,i]%self.d
         if self[i,i] != 1:
-            self = self._apply_operator(self.clif_mult(i, self.dnary_inverse(self[i,i].item()), n=self.n))
+            self = self._apply_operator(self._clif_mult(i, self.dnary_inverse(self[i,i].item()), n=self.n))
         return self
 
     def _get_first_n_rows_except_i_to_zero(self, i:int) -> Self:
@@ -626,7 +626,7 @@ class CliffordBase(SymplecticArrayBase):
         for j in range(n):
             if (j!=i) and (self[j,i] != 0):
                 r = (-1 * self[j,i])%d
-                self = self._apply_operator(self.clif_csum(i,j,r, n))
+                self = self._apply_operator(self._clif_csum(i,j,r, n))
         return self
     
     def _get_i_n_to_zero(self, i:int) -> Self:
@@ -643,7 +643,7 @@ class CliffordBase(SymplecticArrayBase):
         ## get [i+n, i]=0
         if self[i+n, i]!=0:
             r = (-1*self[i+n, i])%d
-            self = self._apply_operator(self.clif_phase(i, r, n))
+            self = self._apply_operator(self._clif_phase(i, r, n))
         return self
     
     def _get_lower_block_to_zero(self, i:int) -> Self:
@@ -660,14 +660,14 @@ class CliffordBase(SymplecticArrayBase):
         ## if the lower block is not already zero:
         if not np.array_equal(self[n:2*n, i], np.zeros(n)):
             ## swap row i to row n+i. [i+n, i] will then be 1 and the whole top block will be 0. CSUMs will leave top block as 0.
-            self = self._apply_operator(self.clif_fourier(i, n))
+            self = self._apply_operator(self._clif_fourier(i, n))
             ## apply CSUMs on the bottom using the 1 in [i+n, i]
             for j in range(n):
                 if (j!=i) and (self[j+n, i]!=0):
                     r = (self[j+n, i])%d
-                    self = self._apply_operator(self.clif_csum(j, i, r, n))
+                    self = self._apply_operator(self._clif_csum(j, i, r, n))
             ## then swap n+i back to i
-            self = self._apply_operator(self.clif_fourier_inv(i, n))
+            self = self._apply_operator(self._clif_fourier_inv(i, n))
         return self
     
     def _get_column_i_to_identity(self, i:int) -> Self:
@@ -706,18 +706,18 @@ class CliffordBase(SymplecticArrayBase):
         for j in range(n):
             if (j!=i) and (self[j+n, i+n]!=0):
                 r = (self[j+n, i+n])%d
-                self = self._apply_operator(self.clif_csum(j, i, r, n))
+                self = self._apply_operator(self._clif_csum(j, i, r, n))
         ## get [i, i+n] to zero
         if self[i, i+n]!=0:
             r = (self[i, i+n])%d
-            self = self._apply_operator(self.clif_phase_inverse(i, r, n))
+            self = self._apply_operator(self._clif_phase_inverse(i, r, n))
         ## get upper block to all zeros if not already
         if not np.array_equal(self[0:n, i+n], np.zeros(n)):
-            self = self._apply_operator(self.clif_fourier_inv(i, n))
+            self = self._apply_operator(self._clif_fourier_inv(i, n))
             for j in range(n):
                 if (j!=i) and (self[j, i+n]!=0):
                     r = (-1*self[j, i+n])
-                    self = self._apply_operator(self.clif_csum(i, j, r, n))
-            self = self._apply_operator(self.clif_fourier(i, n))
+                    self = self._apply_operator(self._clif_csum(i, j, r, n))
+            self = self._apply_operator(self._clif_fourier(i, n))
         
         return self

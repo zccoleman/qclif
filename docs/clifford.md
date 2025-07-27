@@ -2,10 +2,10 @@
 
 ::: qclif.CliffordBase
     options:
-        inherited_members: true
+    options:
         show_root_heading: true
         show_source: false
-        group_by_category: true
-        <!-- show_category_heading: true -->
+        group_by_category: false
+        show_category_heading: true
+        show_if_no_docstring: false
         show_symbol_type_heading: true
-        show_symbol_type_toc: true

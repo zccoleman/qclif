@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Self
 
-from .dnary_array import DnaryArrayBase
+from qclif.dnary_array import DnaryArrayBase
 
 class SymplecticArrayBase(DnaryArrayBase):
     """Class implementing the logic of symplectic vectors and matrices such as inner products and embeddings.

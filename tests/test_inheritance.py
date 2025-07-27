@@ -1,6 +1,6 @@
 import pytest
 
-from qclif._qclifBase.dnary_array import DnaryArrayBase
+from qclif import DnaryArrayBase
 
 
 def test_needs_d():

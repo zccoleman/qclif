@@ -1,6 +1,16 @@
 site_name: Qudit Cliffords
 # site_url: https://test.org
 
+plugins:
+- search
+- autorefs
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+            relative_crossrefs: true    
+            docstring_section_style: spacy
+          
 
 
 nav:
@@ -9,18 +19,13 @@ nav:
   - API Reference:
     - Clifford Gates: clifford.md
     - Symplectic Matrices: symplectic.md
-    - DNary Matrices: dnary.md
+    - D-Nary Matrices: dnary.md
 
 
-plugins:
-- search
-- autorefs
-- mkdocstrings:
-    handlers:
-      python:
-        paths: []
-      
+
+
 theme:
   name: "readthedocs"
+
 
 

@@ -4,7 +4,7 @@ import math
 # from math import gcd, log, ceil
 from numbers import Real
 
-from .validation import validate_integers, validate_primes
+from qclif.validation import validate_integers, validate_primes
 
 
 def extra_ceil(num: Real) -> int:

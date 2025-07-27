@@ -4,8 +4,8 @@ import warnings
 
 from abc import ABCMeta, abstractmethod
 
-from .dnary_arithmetic import rint, dnary_inverse, int_to_dnary, dnary_to_int
-from .validation import validate_primes
+from qclif.dnary_arithmetic import rint, dnary_inverse, int_to_dnary, dnary_to_int
+from qclif.validation import validate_primes
 
 def d_get(cls):
     return cls._d
@@ -60,15 +60,48 @@ class DNaryMeta(ABCMeta):
     
 
 class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
-    """Base class for d-nary integer numpy arrays (with d prime) that are either 1d or 2d square arrays. 
+    """A d-nary integer numpy array. 
     
-    Do not create instances of this class; instead, subclass this class, setting a class property for d, then create instances of that subclass like so:
+    To use, create a subclass of this class and set a value for d as
+    a class property. Then create instances of that subclass from any
+    array-like data. The constructor accepts any data acceptable by np.array(...).
+
+    Examples:
     ```
-    class DnaryArrayD3(PrimeDnaryArrayBase):
-        d=3
-    instance = DnaryArrayD3([1,2,0,1])
+    >>> class D3(DnaryArrayBase): d=3
+
+    >>> D3([1, 2, 3, 4])
+    D3([1, 2, 0, 1])
+
+    >>> D3.eye(4)
+    D3([[1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]])
+
+    >>> D3.eye(4)-2
+    D3([[2, 1, 1, 1],
+        [1, 2, 1, 1],
+        [1, 1, 2, 1],
+        [1, 1, 1, 2]])
+
+    >>> (D3.eye(4)-2).inverse()
+    D3([[2, 1, 1, 1],
+        [1, 2, 1, 1],
+        [1, 1, 2, 1],
+        [1, 1, 1, 2]])
+
+    >>> import numpy as np
+    >>> np.linalg.matrix_power(D3.eye(4)-2, 2)
+    D3([[1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]])
+    
+    >>> class D6(DnaryArrayBase): d=6
+    >>> (2 * D6.eye(2)) @ [2,3]
+    D6([4, 0])
     ```
-    Accepts any data acceptable by np.array(...). 
     """
     
     _validate_prime=False
@@ -77,39 +110,17 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
     @abstractmethod
     def d(self):
         """The modulus of the array class.
+        Should not be changed after class creation.
         """
         raise NotImplementedError
     
     def __new__(cls, data: Any, *args, **kwargs) -> Self:
-        """Create a new prime integer d-nary array. All input data will be coerced to an integer array in numpy, then modded by d.
-
-        Args:
-            data (Any): Data in any acceptable numpy format for a 1d array or a 2d square array.
-
-        Raises:
-            TypeError: You did not set a value for d in the class.
-            ValueError: The data does not result in a 1d array or a 2d square array.
-
-        Returns:
-            Self: A d-nary array.
-        """
         if not isinstance(cls.d, int):
             raise TypeError('Cannot instantiate base class without a definition for d.')
         d = cls.d
-        # validate_primes(d)
         array = np.array(data, dtype=int) % d
-        
-        if array.ndim==1:
-            nn = len(array)
-        elif array.ndim==2:
-            l, w = array.shape
-            if not (l==w or 1 in [l, w]):
-                raise ValueError(f'Input data must be a 1d vector or a 2d square array', data)
-            # nn = max(l,w)
-        else: raise ValueError(f'Input data must be 1- or 2-dimensional', data)
-        # if not nn%2==0: raise ValueError(f'Input data must have an even dimension:', data)
+
         obj = array.view(cls)
-        # obj.flags.writeable = False
         return obj
     
     def __array_finalize__(self, obj):
@@ -166,7 +177,8 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
     
     @property
     def is_vector(self) -> bool:
-        """Checks the dimension of the array. 1d arrays will return True.
+        """Checks the dimension of the array.
+        1d arrays will return True.
 
         Returns:
             bool
@@ -175,7 +187,8 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
     
     @classmethod
     def dnary_inverse(cls, n: int) -> int:
-        """Calculate the d-nary inverse of an integer using the class's value of `d`.
+        """Calculate the d-nary inverse of an
+        integer using the class's value of `d`.
 
         Args:
             n (int): The integer to invert.
@@ -191,22 +204,29 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
 
         Args:
             n (int): The integer to be factored into its d-nary digits.
-            result_list_size (int | None, optional): The length of the list to return; if None, will use the minimum number of digits to result the input integer in d-nary. Defaults to None.
+            result_list_size (int | None, optional): The length of the
+                list to return; if None, will use the minimum number
+                of digits to result the input integer in d-nary.
+                Defaults to None.
 
         Raises:
             ValueError: Invalid input parameters.
 
         Returns:
-            list[int]: A list of the d-nary digits of the input integer. The ith element is the coefficient of d**i in the d-nary expansion of the input.
+            list[int]: A list of the d-nary digits of the input integer.
+                The ith element is the coefficient of d**i in the d-nary
+                expansion of the input.
         """
         return int_to_dnary(n, cls.d, result_list_size)
     
     @classmethod
     def dnary_to_int(cls, digits) -> int:
-        """Given a list of the d-nary digits of a number, return that number in base 10.
+        """Given a list of the d-nary digits of a number, return that
+        number in base 10.
 
         Args:
-            digits (list[int]): A list of the d-nary digits of the number, where the ith element is the coefficient of d**i.
+            digits (list[int]): A list of the d-nary digits of the
+                number, where the ith element is the coefficient of d**i.
 
         Returns:
             int: The number in base 10.
@@ -232,11 +252,13 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
 
     @classmethod
     def random_array(cls, shape:tuple[int], allow_zero=True) -> Self:
-        """Returns an array of the given shape with uniform random integers mod d.
+        """Returns an array of the given shape with uniform
+        random integers mod d.
 
         Args:
             shape (tuple[int]): The shape of the array.
-            allow_zero (bool, optional): Whether to allow the zero matrix. Defaults to True.
+            allow_zero (bool, optional): Whether to allow the zero 
+                matrix. Defaults to True.
 
         Returns:
             Self: A uniform random d-nary array.
@@ -270,8 +292,9 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return cls(np.zeros(shape, dtype='int32'))
     
     @classmethod
-    def basis_vector(cls, i: int, n: int) -> Self:  ## returns the length-n standard basis vector e_i (python indexing)
-        """Generates the ith standard basis vector of length n for the class.
+    def basis_vector(cls, i: int, n: int) -> Self:
+        """Generates the ith standard basis vector of
+        length n for the class.
 
         Args:
             i (int): The component of the basis vector.
@@ -279,6 +302,12 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
 
         Returns:
             Self: A basis vector.
+
+        Examples:
+        ```
+        >>> class D3(DnaryArrayBase): d=3
+        >>> D3.basis_vector(2, 5)
+        D3([0, 0, 1, 0, 0])
         """
         e_i = cls.zeros(n)
         e_i[i]=1
@@ -300,25 +329,33 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return self.determinant()
     
     def is_invertible(self) -> bool:
-        """Determines if a matrix is invertible by checking if its determinant is invertible mod d.
+        """Determines if a matrix is invertible by checking if
+        its determinant is invertible mod d.
 
         Returns:
             bool
         """
         return self.dnary_inverse(self.det()) is not None
     
-    def mod_matrix_inv(self, validate=True, suppress_warnings=True) -> Self|None:  ## calculates the modular inverse of a matrix
-        """Calculates the modular integer matrix inverse using $$A^{-1}=\frac{1}{|A|}Adj(A)$$, where $Adj(A)$ is the matrix adjugate of $A$.
+    def mod_matrix_inv(self, validate=True, suppress_warnings=True) -> Self|None:
+        """Calculates the modular integer matrix inverse using
+        $A^{-1}=\frac{1}{|A|}Adj(A)$, where $Adj(A)$ is the
+        matrix adjugate of $A$ and $|A|$ is the determinant.
 
         Args:
-            validate (bool, optional): Whether to validate the result through multiplication. Defaults to True.
-            suppress_warnings (bool, optional): If False, warnings will be raise if the array is not invertible. Defaults to True.
+            validate (bool, optional): Whether to validate the
+                result through multiplication. Defaults to True.
+            suppress_warnings (bool, optional): If False,
+                warnings will be raise if the array is not
+                invertible. Defaults to True.
 
         Raises:
-            RuntimeError: If the inversion fails for an invertible array. Theoretically this should never happen.
+            RuntimeError: If the inversion fails for an invertible
+                array. Theoretically this should never happen.
 
         Returns:
-            Self|None: The array's inverse, or None if the array is not invertible.
+            Self|None: The array's inverse, or None if the array
+                is not invertible.
         """
         assert self.is_matrix
         
@@ -339,10 +376,20 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return inverse
 
     def inv(self, **kwargs) -> Self|None:
+        """Alias for [`mod_matrix_inv`][qclif.DnaryArrayBase.mod_matrix_inv].
+
+        Returns:
+            Self|None: The array's inverse, or None if
+                the array is not invertible.
+        """
+        return self.mod_matrix_inv(**kwargs)
+    
+    def inverse(self, **kwargs) -> Self|None:
         """Alias for `mod_matrix_inv`.
 
         Returns:
-            Self|None: The array's inverse, or None if the array is not invertible.
+            Self|None: The array's inverse, or None if the
+                array is not invertible.
         """
         return self.mod_matrix_inv(**kwargs)
     
@@ -356,11 +403,17 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return Adj
 
     def _matrix_cofactor(self, row: int, col: int) -> int:
-        """The elements of the cofactor matrix are $C_{i,j} = (-1)^{i+j} M_{i,j}$, where M is the matrix of minors of A."""
+        """The elements of the cofactor matrix are
+        $C_{i,j} = (-1)^{i+j} M_{i,j}$, where M is
+        the matrix of minors of A.
+        """
         return (-1)**(row+col) * self._matrix_minor(row,col)
 
     def _matrix_minor(self, row: int, col: int) -> int:
-        """The elements of the minor matrix $M_{i,j}$ are the determinants of $A$ with rows $i,j$ deleted."""
+        """
+        The elements of the minor matrix $M_{i,j}$
+        are the determinants of $A$ with rows $i,j$ deleted.
+        """
         
         l, w = self.shape
 
@@ -372,6 +425,8 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return rint(np.linalg.det(B))
                 
     def _matrix_delete_rowcol(self, row: int, col: int) -> np.ndarray:
+        """Delete the given row and column and return the reduced array.
+        """
         B = self.view(np.ndarray)
         B=np.delete(B,row,0)
         B=np.delete(B,col,1)

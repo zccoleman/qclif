@@ -1,4 +1,4 @@
-from qclif._qclifBase.dnary_arithmetic import dnary_inverse, dnary_to_int, int_to_dnary
+from qclif.dnary_arithmetic import dnary_inverse, dnary_to_int, int_to_dnary
 
 def test_dnary_inverse():
     inv = dnary_inverse(5, d=3)

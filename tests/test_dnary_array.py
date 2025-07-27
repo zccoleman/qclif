@@ -1,5 +1,5 @@
 import numpy as np
-from qclif._qclifBase.dnary_array import DnaryArrayBase
+from qclif import DnaryArrayBase
 
 
 class D5(DnaryArrayBase):d=5
