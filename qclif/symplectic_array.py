@@ -1,20 +1,68 @@
 import numpy as np
+import math
 from typing import Self
 
 from qclif.dnary_array import DnaryArrayBase
 
 class SymplecticArrayBase(DnaryArrayBase):
-    """Class implementing the logic of symplectic vectors and matrices such as inner products and embeddings.
+    r"""Class implementing
+    [symplectic](https://en.wikipedia.org/wiki/Symplectic_matrix)
+    algebra on matrices and vectors over 
+    $\mathbb{Z}_d$, the modulo-$d$ integers.
+
+    For a given $n>0$, the symplectic group $\text{Sp}(2n, \mathbb{Z}_d)$
+    is the group of $2n\times2n$ matrices $A$ such that
+    $$ A^T \Lambda_n A=\mathbb{I}_{2n},$$
+    where
+    $$\Lambda_n=\begin{bmatrix}0 & -\mathbb{I}_n \\ \mathbb{I}_n & 0 \end{bmatrix} \text{ mod } d$$
+    and $\mathbb{I}_n$ is the $n\times n$ identity matrix.
+
+    Similarly, the symplectic inner product $\langle v, w\rangle$
+    between length-$2n$ vectors $v,w$ is
+    defined as
+    $$ \langle v, w\rangle = v^T\Lambda_n w.$$
+
+    If $\langle v, w\rangle=-1 \text{ mod } d$, we say 
+    $(v,w)$ is a symplectic pair.
+
+    An equivalent definition for a symplectic matrix
+    is the requirement that, for each $0\leq i< n$, the 
+    matrix's $i$th and $(i+n)$th columns form a symplectic pair
+    (Python indexing).
+
+    Note: 
+        $2n\times2n$ symplectic matrices over $\mathbb{Z}_d$ form
+        a representation of the Clifford group $\mathcal{C}_d^n$ on
+        $n$ qudits of dimension $d$. In fact,
+        $$
+        \text{Sp}(2n, \mathbb{Z}_d)\simeq \mathcal{C}_d^n / \mathcal{P}_d^n,
+        $$
+        where $\mathcal{P}_d^n$ is the $n$ qudit Pauli group.
+        See [arXiv:quant-ph/0408190](https://arxiv.org/abs/quant-ph/0408190).
+
+    Note:
+        The matrix $\Lambda_n$ may be defined differently in other contexts.
+        The definition used here follows
+        [arXiv:quant-ph/0408190](https://arxiv.org/abs/quant-ph/0408190).
+        See [here](https://en.wikipedia.org/wiki/Symplectic_matrix#The_matrix_%CE%A9)
+        for other definitions.
+  
     """
 
     @property
     def n(self) -> int:
-        """
+        r"""
+        Half of the array size. Will raise an exception for odd-sized arrays.
+        
+        Defines the defining symplectic array $\Lambda_n$. See the 
+        [`.Lambda`][qclif.SymplecticArrayBase.Lambda] property
+        and the [`.LambdaN`][qclif.SymplecticArrayBase.LambdaN] method. 
+
         Raises:
             ValueError: Not accessible for odd-sized arrays.
 
         Returns:
-            int: Half of the array size.
+            Half of the array size.
         """
         if self.nn%2==0:
             return self.nn//2
@@ -24,22 +72,22 @@ class SymplecticArrayBase(DnaryArrayBase):
     def nn(self) -> int:
         """
         Returns:
-            int: The full array size, or 2*n. 
+            The symplectic array size $2n$.
         """
         return len(self)
     
     @classmethod
     def LambdaN(cls, n: int) -> Self:
-        r"""Returns the defining symplectic array for any given n, defined here as 
-        $\Lambda_n=\begin{bmatrix}0 & -\one_n\\\one_n & 0\end{bmatrix}$.
+        r"""Returns the defining symplectic array $\Lambda_n$ for any given $n$ 
+        using the class modulus $d$.
 
-        See https://en.wikipedia.org/wiki/Symplectic_matrix#The_matrix_%CE%A9.
+        See [`SymplecticArrayBase`][qclif.SymplecticArrayBase].
 
         Args:
-            n (int): Lambda is a (2n, 2n) array.
+            n (int): $\Lambda_n$ is a $2n\times 2n$ array.
 
         Returns:
-            Self: The d-nary (2n, 2n) array that defines the symplectic group and symplectic inner product.
+            The $d$-nary (2n, 2n) array that defines the symplectic group and symplectic inner product.
         """
         U = np.zeros((2*n,2*n),dtype='int32')
         for i in range(n):
@@ -48,23 +96,35 @@ class SymplecticArrayBase(DnaryArrayBase):
     
     @property
     def Lambda(self) -> Self:
-        """
+        r"""
         Returns:
-            Self: The symplectic array matching the current object's dimension (nn by nn).
+            The defining symplectic array matching the invoking
+                object's dimension ($2n\times 2n$).
+                
+                See [`.LambdaN`][qclif.SymplecticArrayBase.LambdaN].
         """
         return self.LambdaN(self.n)
 
     def is_symplectic_pair_with(self, other: Self) -> bool:
-        """If the current object is a vector, determine whether it forms a symplectic pair with another vector.
+        r"""If the calling object is a vector (i.e. 1D array),
+        determine whether it forms a symplectic pair with another
+        vector.
+
+        See the [`.is_symplectic_pair`][qclif.SymplecticArrayBase.is_symplectic_pair]
+        classmethod.
+
+        Raises an exception if the calling object is not a vector.
 
         Args:
             other (Self): The other vector.
 
         Raises:
-            TypeError: Both the calling object and the input must be 1d arrays.
+            TypeError: Both the calling object and the input 
+                must be 1d arrays.
 
         Returns:
-            bool: Whether the two vectors form a symplectic pair (have a symplectic inner product of -1 (mod d)).
+            Whether the two vectors form a
+                symplectic pair.
         """
         if not self.is_vector and other.is_vector:
             raise TypeError('Can only compute symplectic pairs between vectors', self, other)
@@ -73,7 +133,7 @@ class SymplecticArrayBase(DnaryArrayBase):
     def is_symplectic_matrix(self) -> bool:
         """
         Returns:
-            bool: whether the calling array is a symplectic matrix.
+            Whether the calling array is a symplectic matrix.
         """
         result = np.array_equal(
             self.Lambda,
@@ -83,27 +143,60 @@ class SymplecticArrayBase(DnaryArrayBase):
     
 
     def inner_product_with(self, other: Self) -> int:
-        """Compute the symplectic inner product of the calling vector (v1) with the other vector (v2).
+        r"""Compute the symplectic inner product
+        of the calling vector with the other vector.
+
+        See the [`.inner_product`][qclif.SymplecticArrayBase.inner_product]
+        classmethod.
 
         Args:
-            other (Self): The other vector (v2).
+            other (Self): The other vector.
 
         Returns:
-            int: The symplectic inner product v1 @ Lambda @ v2 (mod d).
+            The symplectic inner product of the calling
+                vector with the other vector.
+
+        Tip:
+            Python's pipe operator `|` is overloaded with this method, so you can
+            call `v1.inner_product_with(v2)` as `v1 | v2`.
+
+        Examples:
+        ```
+        >>> class S3(SymplecticArrayBase): d=3
+        >>> v1 = S3([1, 0, 0, 0])
+        >>> v2 = S3([0, 0, 1, 0])
+        >>> v1 | v2
+        2
+        ```
         """
         return self.__class__.inner_product(self, other)
     
     def __or__(self, other) -> int:
-        """Overloads the pipe (|) operator as an alias for the symplectic inner product.
-        """
         return self.inner_product_with(other)
     
 
-    def embed_symplectic(self) -> Self:  ## embeds the 2n x 2n symplectic matrix q into a 2n+1 x 2n+1 symplectic matrix Q.
-        """Embeds a (2n, 2n) array into a (2n+1, 2n+1) array, preserving symplecticity.
+    def embed_symplectic(self) -> Self:  
+        r"""Embeds a $2n\times 2n$ array into a
+        $(2n+1)\times(2n+1)$ array via the symplecticity-preserving
+        block embedding
+        $$
+        \begin{bmatrix}
+            M_{11} & M_{12}\\
+            M_{21} & M_{22}
+        \end{bmatrix}
+        \mapsto
+        \begin{bmatrix}
+            1 & 0 & 0 & 0\\
+            0& M_{11} & 0 & M_{12}\\
+            0 & 0 & 1 & 0\\
+            0 & M_{21} & 0 & M_{22}
+        \end{bmatrix},
+        $$
+        which inserts identity rows/columns at indices
+        $0$ and $n$ (Python indexing) and fills the gaps with zeros.
 
         Returns:
-            Self: The embedded array.
+            The embedded array.
         """
         if not self.is_matrix:
             raise ValueError("Can only perform symplectic embedding for square arrays.")
@@ -120,20 +213,36 @@ class SymplecticArrayBase(DnaryArrayBase):
         return type(self)(Q)
     
     @classmethod
-    def inner_product(cls, v1: Self, v2: Self) -> int:
-        """Computes the symplecitc inner product of the given vectors coerced into the type of the calling class.
-        Thus, the vectors may be defined in a class with a different modulus (d).
+    def inner_product(cls, v1: Self|np.ndarray, v2: Self|np.ndarray) -> int:
+        r"""Computes the symplectic inner product of the
+        given vectors.
+
+        The symplectic inner product $\langle v, w\rangle$
+        between length-$2n$ vectors $v,w$ is
+        defined as
+        $$ \langle v, w\rangle = v^T\Lambda_n w.$$ 
 
         Args:
-            v1 (Self): The first vector. Will be coerced into the type of the calling class.
-            v2 (Self): The second vector. Will be coerced into the type of the calling class.
+            v1 (Self|np.ndarray): The first vector. Will be coerced into the type of the calling class.
+            v2 (Self|np.ndarray): The second vector. Will be coerced into the type of the calling class.
 
         Raises:
             ValueError: Input arrays are not one-dimensional.
             ValueError: Input arrays are not the same size.
 
         Returns:
-            int: The symplectic inner product (as defined by the calling class) of v1 and v2.
+            The symplectic inner product of `v1` and `v2`.
+
+        Tip:
+            If you've already created a vector `v`, you can call
+            `v.inner_product_with(w)` method to compute
+            $\langle v,w\rangle$.
+
+        Note:
+            The modulus $d$ is defined by the calling class.
+            Thus, `v1` and `v2` can be any array-like data, but they
+            will be coerced into the type of the calling class
+            (by coercing components to integers and modding by $d$).
         """
         v1 = cls.check_or_coerce_type(v1)
         v2 = cls.check_or_coerce_type(v2) 
@@ -150,13 +259,34 @@ class SymplecticArrayBase(DnaryArrayBase):
 
     @classmethod
     def is_symplectic_pair(cls, v1: Self, v2: Self) -> bool:
-        """Determine whether a pair of vectors coerced into the calling class form a symplectic pair (have an inner product of -1).
+        r"""Determine whether a pair of vectors 
+        form a symplectic pair.
+
+        Two vectors $v, w$ form a symplectic pair if
+        $$\langle v, w\rangle = -1 \text{ mod } d.$$
+
+        See also [`.is_symplectic_pair_with`][qclif.SymplecticArrayBase.is_symplectic_pair_with].
 
         Args:
             v1 (Self): The first vector.
             v2 (Self): The second vector.
 
         Returns:
-            bool: Whether the vectors form a symplectic pair.
+            Whether the vectors form a symplectic pair.
         """
         return cls.inner_product(v1, v2)==(-1 % cls.d)
+        
+    @classmethod
+    def symplectic_group_size(cls, n: int) -> int:
+        r"""Returns the size of the symplectic group for a given n.
+
+        Args:
+            n (int): Half the size of the symplectic matrix,
+                or the number of qubits in the equivalent Clifford group.
+
+        Returns:
+            The number of different $2n\times 2n$ symplectic
+                matrices over $\mathbb{Z}_d$. 
+        """
+        d = cls.d
+        return math.prod((d**(2*j-1)) * (d**(2*j)-1) for j in range(1, n+1))

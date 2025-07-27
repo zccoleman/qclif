@@ -189,18 +189,7 @@ class CliffordBase(SymplecticArrayBase):
         cls._validate_qudit_indices(n)
         return d**(n*(n+2)) * math.prod(d**(2*j)-1 for j in range(1, n+1))
     
-    @classmethod
-    def symplectic_group_size(cls, n: int) -> int:
-        """Returns the size of the symplectic group for a given n.
 
-        Args:
-            n (int): Half the size of the symplectic matrix, or the number of qubits in the equivalent Clifford group.
-
-        Returns:
-            int: The size of the symplectic group. 
-        """
-        d = cls.d
-        return math.prod((d**(2*j-1)) * (d**(2*j)-1) for j in range(1, n+1))
     
     @classmethod
     def random_symplectic(cls, n: int) -> Self:

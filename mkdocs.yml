@@ -8,10 +8,16 @@ plugins:
     handlers:
       python:
         options:
-            relative_crossrefs: true    
+            relative_crossrefs: true
             docstring_section_style: spacy
           
 
+extra_javascript: 
+- https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+
+markdown_extensions: 
+- mdx_math:
+    enable_dollar_delimiter: True
 
 nav:
   - Home: index.md
@@ -20,6 +26,7 @@ nav:
     - Clifford Gates: clifford.md
     - Symplectic Matrices: symplectic.md
     - D-Nary Matrices: dnary.md
+    - D-Nary Arithmetic: dnary_arithmetic.md 
 
 
 

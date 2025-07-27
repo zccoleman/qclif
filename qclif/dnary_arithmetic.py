@@ -7,87 +7,100 @@ from numbers import Real
 from qclif.validation import validate_integers, validate_primes
 
 
-def extra_ceil(num: Real) -> int:
-    """Returns the smallest integer N such that N>num.
-
+def extra_ceil(n: Real) -> int:
+    """
     Args:
         num (Real): The number to ceil
 
     Returns:
-        int: The smallest integer N such that N>num.
+        Returns the smallest integer $N$ such that $N>n$.
     """
-    result = math.ceil(num)
-    if result==num:
+    result = math.ceil(n)
+    if result==n:
         return int(result+1)
     return int(result)
 
-def int_to_dnary(input_integer: int, d: int, result_list_size: int|None=None) -> list[int]:
-    """Determines the d-nary digits of an input integer such that input_integer = sum(result[i] * d**i for i in range(result_list_size))
+def int_to_dnary(n: int, d: int, result_list_size: int|None=None) -> list[int]:
+    r"""Decomposes a base 10 integer into a list of its $d$-nary digits.
+
+    See also [`dnary_to_int`][qclif.dnary_arithmetic.dnary_to_int].
 
     Args:
-        input_integer (int): The integer to be factored into its d-nary digits.
-        d (int): The modulus.
-        result_list_size (int | None, optional): The length of the list to return; if None, will use the minimum number of digits to result the input integer in d-nary. Defaults to None.
+        n (int): The base 10 integer to be factored into its $d$-nary digits.
+        result_list_size (int | None, optional): The length of the
+            list to return; if `None`, will use the minimum number
+            of digits to result the input integer in $d$-nary.
+            Defaults to `None`.
 
     Raises:
         ValueError: Invalid input parameters.
 
     Returns:
-        list[int]: A list of the d-nary digits of the input integer. The ith element is the coefficient of d**i in the d-nary expansion of the input.
+        A list of the $d$-nary digits of `n`
+            The list has $L$ elements $l_i$ such that $$n=\sum_{i=0}^L l_i d^i.$$
     """
-    validate_integers(input_integer, d)
-    if input_integer<0:
-        raise ValueError('Input integer must be non-negative', input_integer)
+    validate_integers(n, d)
+    if n<0:
+        raise ValueError('Input integer must be non-negative', n)
 
-    if input_integer==0:
+    if n==0:
         required_size = 1
     else:
-        required_size = extra_ceil(math.log(input_integer, d))
+        required_size = extra_ceil(math.log(n, d))
     
     if result_list_size is None:
         result_list_size = required_size
     else:
         if not result_list_size >= required_size:
-            raise ValueError(f'Input integer {input_integer} requires more than {result_list_size} digits.')
+            raise ValueError(f'Input integer {n} requires more than {result_list_size} digits.')
 
     validate_integers(result_list_size)
     
     digits = [0 for _ in range(result_list_size)]
 
     for j in range(result_list_size):
-        current_digit = rint(input_integer%d)
+        current_digit = rint(n%d)
         digits[j] = current_digit
-        input_integer -= current_digit
-        input_integer = input_integer/d
+        n -= current_digit
+        n = n/d
 
     return digits
 
 def dnary_to_int(digits: list[int], d: int) -> int:
-    """Given a list of the d-nary digits of a number, return that number in base 10
+    """
+    Given a list of the $d$-nary digits of a number, return that
+    number in base 10. 
+
+    See also [`int_to_dnary`][qclif.dnary_arithmetic.int_to_dnary].
 
     Args:
-        digits (list[int]): A list of the d-nary digits of the number, where the ith element is the coefficient of d**i.
-        d (int): The modulus of the number.
+        digits (list[int]): A list of the $d$-nary digits of a
+            number.
 
     Returns:
-        int: The number in base 10.
+        The number in base 10.
     """
     validate_integers(d, *digits)
     return sum(digits[i] * d**i for i in range(len(digits)))
 
-def dnary_inverse(input_integer: int, d: int) -> int:
-    """Calculates the inverse of the input integer in base d.
+def dnary_inverse(n: int, d: int) -> int|None:
+    r"""
+    Calculates the multiplicative inverse of `n` in $\mathbb{Z}_d$ if it exists.
+    
+    If $d$ is prime and $n>0$, the integer is guaranteed to exist.
+    For general $d$, $n^{-1}$ exists if $\text{gcd}(n,d)=1$.
 
     Args:
-        input_integer (int): The integer to invert.
+        n (int): The integer to invert.
         d (int): The modulus to invert by.
 
     Returns:
-        int: The integer n such that n * input_integer % d = 1.
+        The integer $n^{-1}$ such that $n n^{-1} \text{ mod } d = 1$, 
+            or `None` if such an integer does not exist.
     """
     
     try:
-        return pow(input_integer, -1, d)
+        return pow(n, -1, d)
     except ValueError:
         return None
     # except TypeError:
@@ -122,12 +135,11 @@ def dnary_inverse(input_integer: int, d: int) -> int:
 #     return t
 
 def rint(i:Real)->int:
-    """Rounds i to the nearest integer and returns an integer type.
-
+    """
     Args:
         i (Real)
 
     Returns:
-        int
+        The input rounded to the nearest integer and cast as `int`. 
     """
     return int(np.rint(i))
