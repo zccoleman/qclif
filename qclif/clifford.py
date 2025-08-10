@@ -4,7 +4,7 @@ import math
 from typing import Self, Any, Literal
 from numbers import Integral
 
-from qclif.symplectic_array import SymplecticArrayBase
+from qclif.symplectic_array import SymplecticArray
 from qclif.validation import validate_primes
 
 class Transvection:
@@ -169,7 +169,7 @@ class Transvection:
         assert np.array_equal(T1(z),v)
         return T1, T2
 
-class CliffordBase(SymplecticArrayBase):
+class CliffordBase(SymplecticArray):
     """A base class for your Clifford group!
 
     """

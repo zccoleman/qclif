@@ -24,8 +24,8 @@ nav:
   - Usage: usage.md
   - API Reference:
     - Clifford Gates: clifford.md
-    - Symplectic Matrices: symplectic.md
-    - D-Nary Matrices: dnary.md
+    - Symplectic Arrays: symplectic.md
+    - D-Nary Arrays: dnary.md
     - D-Nary Arithmetic: dnary_arithmetic.md 
 
 

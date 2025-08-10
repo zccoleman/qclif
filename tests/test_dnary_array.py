@@ -1,9 +1,9 @@
 import numpy as np
-from qclif import DnaryArrayBase
+from qclif import DnaryArray
 
 
-class D5(DnaryArrayBase):d=5
-class D3(DnaryArrayBase):d=3
+D5 = DnaryArray.set_d(5)
+D3 = DnaryArray.set_d(3)
 
 def test_invertible():
     assert D3.eye(2).is_invertible()
@@ -22,5 +22,18 @@ def test_random_inverse():
 
 
 def test_composite_dnary():
-    class D4(DnaryArrayBase):d=4
-    
+    class D4(DnaryArray):d=4
+
+def test_dnary_logic():
+    one = D3([1])
+    two = D3([2])
+    five = D3([5])
+
+    assert (one + two).item()==0
+    assert five.item()==two.item()
+    assert (two+five).item()==one.item()
+
+def test_standard_basis():
+    u = D5([1,0,0,0])
+    v = D5.basis_vector(0,4)
+    assert np.array_equal(u,v)

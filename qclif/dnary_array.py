@@ -1,5 +1,6 @@
+from __future__ import annotations
 import numpy as np
-from typing import Self, Any
+from typing import Self, Any 
 import warnings
 
 from abc import ABCMeta, abstractmethod
@@ -59,20 +60,21 @@ class DNaryMeta(ABCMeta):
         return u
     
 
-class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
+class DnaryArray(np.ndarray, metaclass=DNaryMeta):
     r"""A $d$-nary integer `numpy` array. Use as a normal `numpy`,
     but all outputs will be computed using arithmetic in $\mathbb{Z}_d$.
     
-    To use, create a subclass of this class and set a value for `d` as
-    a class property. Then create instances of that subclass from any
-    array-like data. The constructor accepts any data acceptable by `np.array(...)`.
+    Do not directly create instances of this class! Instead, use the classmethod 
+    [`DnaryArray.set_d(...)`][qclif.DnaryArray.set_d] to create
+    a subclass with a specific value for `d`, then create instances of that subclass.
+    
+    Instances can be created from any array-like data acceptable by `np.array(...)`.
 
     Examples:
     ```
-    >>> class D3(DnaryArrayBase): d=3
-
+    >>> D3 = DnaryArray.set_d(3)
     >>> D3([1, 2, 3, 4])
-    D3([1, 2, 0, 1])
+    DnaryArray(d=3)([1, 2, 0, 1])
 
     >>> D3.eye(4)
     D3([[1, 0, 0, 0],
@@ -99,14 +101,13 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         [0, 0, 1, 0],
         [0, 0, 0, 1]])
     
-    >>> class D6(DnaryArrayBase): d=6
-    >>> (2 * D6.eye(2)) @ [2,3]
-    D6([4, 0])
+    >>> MyD6Array = DnaryArray.set_d(6)
+    >>> (2 * MyD6Array.eye(2)) @ [2,3]
+    MyD6Array([4, 0])
     ```
     """
     
     _validate_prime=False
-
     @property
     @abstractmethod
     def d(self):
@@ -208,7 +209,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         
         Decomposes a base 10 integer into a list of its $d$-nary digits.
 
-        See also [qclif.DnaryArrayBase.dnary_to_int].
+        See also [qclif.DnaryArray.dnary_to_int].
 
         Args:
             n (int): The base 10 integer to be factored into its $d$-nary digits.
@@ -232,7 +233,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         Given a list of the $d$-nary digits of a number, return that
         number in base 10. 
 
-        See also [qclif.DnaryArrayBase.int_to_dnary].
+        See also [qclif.DnaryArray.int_to_dnary].
 
         Args:
             digits (list[int]): A list of the $d$-nary digits of a
@@ -315,7 +316,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
 
         Examples:
         ```
-        >>> class D3(DnaryArrayBase): d=3
+        >>> class D3(DnaryArray): d=3
         >>> D3.basis_vector(1, 5)
         D3([0, 1, 0, 0, 0])
         """
@@ -331,7 +332,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return rint(np.linalg.det(self)) % self.d
     
     def det(self) -> int:
-        """Alias for [`.determinant`][qclif.DnaryArrayBase.determinant].
+        """Alias for [`.determinant`][qclif.DnaryArray.determinant].
 
         Returns:
             The determinant of the array modulo $d$.
@@ -387,7 +388,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return inverse
 
     def inv(self, **kwargs) -> Self|None:
-        """Alias for [`mod_matrix_inv`][qclif.DnaryArrayBase.mod_matrix_inv].
+        """Alias for [`mod_matrix_inv`][qclif.DnaryArray.mod_matrix_inv].
 
         Returns:
             The array's inverse, or `None` if
@@ -396,7 +397,7 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         return self.mod_matrix_inv(**kwargs)
     
     def inverse(self, **kwargs) -> Self|None:
-        """Alias for [`mod_matrix_inv`][qclif.DnaryArrayBase.mod_matrix_inv].
+        """Alias for [`mod_matrix_inv`][qclif.DnaryArray.mod_matrix_inv].
 
         Returns:
             The array's inverse, or `None` if the
@@ -443,6 +444,16 @@ class DnaryArrayBase(np.ndarray, metaclass=DNaryMeta):
         B=np.delete(B,col,1)
         return B
 
+    @classmethod
+    def set_d(cls, d) -> type[DnaryArray]:
+        """Classmethod for creating a child class with a specific d.
 
+        Args:
+            d (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        return type(f'{cls.__name__}(d={d})', (cls, ), {'d':d})
 
     
