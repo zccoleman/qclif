@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>D-Nary Arrays - Qudit Cliffords</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "D-Nary Arrays";
+        var mkdocs_page_input_path = "dnary.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Qudit Cliffords
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../usage/">Usage</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../clifford/">Clifford Gates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../symplectic/">Symplectic Arrays</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">D-Nary Arrays</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.basis_vector">basis_vector</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.d">d</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.det">det</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.determinant">determinant</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.dnary_inverse">dnary_inverse</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.dnary_to_int">dnary_to_int</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.eye">eye</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.int_to_dnary">int_to_dnary</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.inv">inv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.inverse">inverse</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.is_invertible">is_invertible</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.is_matrix">is_matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.is_nonzero">is_nonzero</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.is_vector">is_vector</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.is_zero">is_zero</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.mod_matrix_inv">mod_matrix_inv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.random_array">random_array</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.set_d">set_d</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qclif.DnaryArray.zeros">zeros</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dnary_arithmetic/">D-Nary Arithmetic</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Qudit Cliffords</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+      <li class="breadcrumb-item active">D-Nary Arrays</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <div class="doc doc-object doc-class">
+
+
+
+<h2 id="qclif.DnaryArray" class="doc doc-heading">
+            <code>qclif.DnaryArray</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="numpy.ndarray">ndarray</span></code></p>
+
+
+        <p>A <script type="math/tex">d</script>-nary integer <code>numpy</code> array. Use as a normal <code>numpy</code>,
+but all outputs will be computed using arithmetic in <script type="math/tex">\mathbb{Z}_d</script>.</p>
+<p>Do not directly create instances of this class! Instead, use the classmethod 
+<a class="autorefs autorefs-internal" title="set_d(d)
+
+  
+      classmethod
+  " href="#qclif.DnaryArray.set_d"><code>DnaryArray.set_d(...)</code></a> to create
+a subclass with a specific value for <code>d</code>, then create instances of that subclass.</p>
+<p>Instances can be created from any array-like data acceptable by <code>np.array(...)</code>.</p>
+<p>Examples:</p>
+<pre><code>&gt;&gt;&gt; D3 = DnaryArray.set_d(3)
+&gt;&gt;&gt; D3([1, 2, 3, 4])
+DnaryArray(d=3)([1, 2, 0, 1])
+
+&gt;&gt;&gt; D3.eye(4)
+D3([[1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]])
+
+&gt;&gt;&gt; D3.eye(4)-2
+D3([[2, 1, 1, 1],
+    [1, 2, 1, 1],
+    [1, 1, 2, 1],
+    [1, 1, 1, 2]])
+
+&gt;&gt;&gt; (D3.eye(4)-2).inverse()
+D3([[2, 1, 1, 1],
+    [1, 2, 1, 1],
+    [1, 1, 2, 1],
+    [1, 1, 1, 2]])
+
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; np.linalg.matrix_power(D3.eye(4)-2, 2)
+D3([[1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]])
+
+&gt;&gt;&gt; MyD6Array = DnaryArray.set_d(6)
+&gt;&gt;&gt; (2 * MyD6Array.eye(2)) @ [2,3]
+MyD6Array([4, 0])
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.basis_vector" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">basis_vector</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Generates the <script type="math/tex">i</script>th standard basis vector of
+length <script type="math/tex">n</script>. This is the vector of all zeros except
+the <script type="math/tex">i</script>th component equal to <script type="math/tex">1</script>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>i</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The component of the basis vector.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>n</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The length of the vector</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The <script type="math/tex">i</script>th standard basis vector.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>        <p>Examples:
+```</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>class D3(DnaryArray): d=3
+D3.basis_vector(1, 5)
+D3([0, 1, 0, 0, 0])</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="qclif.DnaryArray.d" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">d</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The modulus of the array class.
+Should not be changed after class creation.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.det" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">det</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="determinant()" href="#qclif.DnaryArray.determinant"><code>.determinant</code></a>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The determinant of the array modulo <script type="math/tex">d</script>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.determinant" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">determinant</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The determinant of the array modulo d.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.dnary_inverse" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">dnary_inverse</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="dnary_inverse(n, d)" href="../dnary_arithmetic/#qclif.dnary_arithmetic.dnary_inverse"><code>dnary_inverse(n, cls.d)</code></a>.
+Calculates the multiplicative inverse of <code>n</code> in <script type="math/tex">\mathbb{Z}_d</script> if it exists.</p>
+<p>If <script type="math/tex">d</script> is prime and <script type="math/tex">n>0</script>, the integer is guaranteed to exist.
+For general <script type="math/tex">d</script>, <script type="math/tex">n^{-1}</script> exists if <script type="math/tex">\text{gcd}(n,d)=1</script>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>n</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The integer to invert.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The integer <script type="math/tex">n^{-1}</script> such that <script type="math/tex">n n^{-1} \text{ mod } d = 1</script>, 
+or <code>None</code> if such an integer does not exist.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.dnary_to_int" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">dnary_to_int</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="dnary_to_int(digits, d)" href="../dnary_arithmetic/#qclif.dnary_arithmetic.dnary_to_int"><code>int_to_dnary(n, cls.d)</code></a>.
+Given a list of the <script type="math/tex">d</script>-nary digits of a number, return that
+number in base 10. </p>
+<p>See also [qclif.DnaryArray.int_to_dnary].</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>digits</code></b>
+                  (<code><span title="list">list</span>[<span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>A list of the <script type="math/tex">d</script>-nary digits of a
+number.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="int">int</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The number in base 10.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.eye" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The <code>(n, n)</code> identity matrix with integer type.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.int_to_dnary" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">int_to_dnary</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result_list_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="int_to_dnary(n, d, result_list_size=None)" href="../dnary_arithmetic/#qclif.dnary_arithmetic.int_to_dnary"><code>int_to_dnary(n, cls.d)</code></a>.</p>
+<p>Decomposes a base 10 integer into a list of its <script type="math/tex">d</script>-nary digits.</p>
+<p>See also [qclif.DnaryArray.dnary_to_int].</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>n</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The base 10 integer to be factored into its <script type="math/tex">d</script>-nary digits.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>result_list_size</code></b>
+                  (<code><span title="int">int</span> | None</code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>The length of the
+list to return; if <code>None</code>, will use the minimum number
+of digits to result the input integer in <script type="math/tex">d</script>-nary.
+Defaults to <code>None</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="ValueError">ValueError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Invalid input parameters.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="list">list</span>[<span title="int">int</span>]</code>
+              –
+              <div class="doc-md-description">
+                <p>A list of the <script type="math/tex">d</script>-nary digits of <code>n</code>
+The list has <script type="math/tex">L</script> elements <script type="math/tex">l_i</script> such that <script type="math/tex; mode=display">n=\sum_{i=0}^L l_i d^i.</script>
+</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.inv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">inv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="mod_matrix_inv(validate=True, suppress_warnings=True)" href="#qclif.DnaryArray.mod_matrix_inv"><code>mod_matrix_inv</code></a>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>The array's inverse, or <code>None</code> if
+the array is not invertible.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.inverse" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Alias for <a class="autorefs autorefs-internal" title="mod_matrix_inv(validate=True, suppress_warnings=True)" href="#qclif.DnaryArray.mod_matrix_inv"><code>mod_matrix_inv</code></a>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>The array's inverse, or <code>None</code> if the
+array is not invertible.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.is_invertible" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_invertible</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Determines if an array is invertible by checking if
+its determinant is invertible in <script type="math/tex">\mathbb{Z}_d</script>.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="bool">bool</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Whether the array is invertible.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="qclif.DnaryArray.is_matrix" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_matrix</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="bool">bool</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Whether this is a 2D array.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.is_nonzero" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_nonzero</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="bool">bool</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Whether the array has any nonzero values in it.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="qclif.DnaryArray.is_vector" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_vector</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="bool">bool</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Whether this is a 1D array.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.is_zero" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_zero</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="bool">bool</span></code>
+              –
+              <div class="doc-md-description">
+                <p>Whether the array is all zero.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.mod_matrix_inv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">mod_matrix_inv</span><span class="p">(</span><span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">suppress_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Calculates the matrix inverse in <script type="math/tex">\mathbb{Z}_d</script>-arithmetic
+using
+<script type="math/tex; mode=display">A^{-1}=\frac{1}{|A|}\text{Adj}(A),</script>
+where <script type="math/tex">\text{Adj}(A)</script> is the
+<a href="https://en.wikipedia.org/wiki/Adjugate_matrix">matrix adjugate</a>
+of <script type="math/tex">A</script> and <script type="math/tex">|A|</script> is the determinant.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>validate</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to validate the
+result through multiplication. Defaults to True.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>suppress_warnings</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If False,
+warnings will be raise if the array is not
+invertible. Defaults to True.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Raises:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="RuntimeError">RuntimeError</span></code>
+              –
+              <div class="doc-md-description">
+                <p>If the inversion fails for an invertible
+array. Theoretically this should never happen.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span> | None</code>
+              –
+              <div class="doc-md-description">
+                <p>The array's inverse, or <code>None</code> if the array
+is not invertible.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.random_array" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">random_array</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">allow_zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns an array of the given shape with uniform
+random integers mod <script type="math/tex">d</script>, including the all-zero array
+unless specified otherwise.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>shape</code></b>
+                  (<code><span title="tuple">tuple</span>[<span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>The shape of the array.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>allow_zero</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Whether to allow the zero 
+matrix. Defaults to <code>True</code>.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span></code>
+              –
+              <div class="doc-md-description">
+                <p>A uniform random <script type="math/tex">d</script>-nary array.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.set_d" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_d</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Classmethod for creating a child class with a specific d.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>d</code></b>
+                  (<code><span title="_type_">_type_</span></code>)
+              –
+              <div class="doc-md-description">
+                <p><em>description</em></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+<b><code>_type_</code></b>(                  <code><span title="type">type</span>[<a class="autorefs autorefs-internal" title="qclif.DnaryArray (qclif.dnary_array.DnaryArray)" href="#qclif.DnaryArray">DnaryArray</a>]</code>
+)              –
+              <div class="doc-md-description">
+                <p><em>description</em></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qclif.DnaryArray.zeros" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns an all-zero array of the given shape.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>shape</code></b>
+                  (<code><span title="int">int</span> | <span title="tuple">tuple</span>[<span title="int">int</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>The shape of the desired array.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><span title="typing.Self">Self</span></code>
+              –
+              <div class="doc-md-description">
+                <p>The zero array of the given shape.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../symplectic/" class="btn btn-neutral float-left" title="Symplectic Arrays"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../dnary_arithmetic/" class="btn btn-neutral float-right" title="D-Nary Arithmetic">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../symplectic/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../dnary_arithmetic/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
